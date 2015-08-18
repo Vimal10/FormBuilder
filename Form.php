@@ -3,7 +3,7 @@
 /**
  * 
  * @package	FormBuilder
- * @author	Vimal Mistry <vimalmistry@gmail.com>
+ * @author	Vimal Mistry <vimalmistry10@gmail.com>
  * @website	http://oceantricks.com
  * @copyright	Copyright (c) 2015
  * @link http://github.com/Vimal10/FormBuilder
