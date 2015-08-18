@@ -1,75 +1,59 @@
 
 <?php
-//TODO
-
 /**
- * Form::open()
  * 
- * Form::close()
- * 
- * Form::email()
- * 
- * {{ Form::open(array('url' => 'foo/bar')) }}
-  //
-  {{ Form::close() }}
- *
- * 
- * echo Form::open(array('url' => 'foo/bar', 'method' => 'put'))
- *  echo Form::token();
- * 
- * echo Form::password('password');
-  Generating Other Inputs
-
-  echo Form::email($name, $value = null, $attributes = array());
-  echo Form::file($name, $attributes = array());
-
-  Checkboxes and Radio Buttons
-
-  Generating A Checkbox Or Radio Input
-
-  echo Form::checkbox('name', 'value');
-
-  echo Form::radio('name', 'value');
-  Generating A Checkbox Or Radio Input That Is Checked
-
-  echo Form::checkbox('name', 'value', true);
-
-  echo Form::radio('name', 'value', true);
-  echo Form::number('name', 'value');
-  echo Form::select('size', array('L' => 'Large', 'S' => 'Small'));
-  Generating A Drop-Down List With Selected Default
-
-  echo Form::select('size', array('L' => 'Large', 'S' => 'Small'), 'S');
-  Generating A Grouped List
-
-  echo Form::select('animal', array(
-  'Cats' => array('leopard' => 'Leopard'),
-  'Dogs' => array('spaniel' => 'Spaniel'),
-  ));
-  Generating A Drop-Down List With A Range
-
-  echo Form::selectRange('number', 10, 20);
-  Generating A List With Month Names
-
-  echo Form::selectMonth('month');
-
-  Buttons
- * 
+ * @package	FormBuilder
+ * @author	Vimal Mistry <vimalmistry@gmail.com>
+ * @website	http://oceantricks.com
+ * @copyright	Copyright (c) 2015
+ * @link http://github.com/Vimal10/FormBuilder
+ * @Version 1.0.0
+ * @filesource
  */
+
 class Form {
 
-//Not Working
-    public $type = null; //type of input
-    public $class = []; //have multiple class
-    public static $elements = []; //for all element //action
-    //for form only
-    public static $hidden = []; //for open form only :)
-    //for checkbox and radiobox
-    public static $options = [];
-    public static $selected = null;
-    //btn
-    public static $btnName = null;
-    public static $for = null;
+    /**
+     * Element Type
+     * @var string
+     */
+    public $element_type = null;
+
+    /**
+     * Element name=>value in array
+     * @var array
+     */
+    public $elements = [];
+    /**
+     * Display Name for some case
+     * @var string
+     */
+    public $display_name = null;
+
+    /**
+     * Display Value for some case
+     * @var string
+     */
+    public $display_value = null;
+
+    /**
+     * For Form Open Only
+     * Hidden Field Directly Add to Array
+     * @var array
+     */
+    public $hidden = [];
+
+    /**
+     * Options =>radio|checkbox|select
+     * @var array
+     */
+    public $options = [];
+
+    /**
+     * Selected Option
+     * @var mix 
+     */
+    public $selected = null;
 
     public function __construct()
     {
@@ -77,293 +61,420 @@ class Form {
     }
 
     /**
-     * DONE
-     * Form::open()
-     * Action
-     * Method//default post
-     * Chartset
-     * Extra Attribute
-     * ' enctype="multipart/form-data"'
-     * hidden fields['name'=>'value']
-     * Cstf
+     * 
+     * @param  $action
+     * @param  $hiddenFields
+     * @return \Form
      */
-    public static function open($action = '', $hiddenFields = [])
+    public static function open($action = null, $hiddenFields = [])
     {
-        
+        $form = new Form();
+        $form->element_type = 'form';
+        if (!is_null($action))
+        {
+            $form->elements['action'] = $action;
+        }
+        if (!empty($hiddenFields))
+        {
+            //do something
+            foreach ($hiddenFields as $k => $v)
+            {
+                $form->hidden[$k] = $v;
+            }
+        }
+        return $form;
     }
 
     /**
-     * DONE
+     * 
+     * @return \Form
      */
-    //form elements
     public function multipart()
     {
         //store to element
+        $this->elements['enctype'] = 'multipart/form-data';
+        return $this;
     }
 
     /**
-     * DONE
+     * 
      * @return string
      */
     public static function close()
     {
-        return "</form>";
+        return "</form>" . PHP_EOL;
     }
 
-    /**
-     * Functions
+    /*
+     * =================================================
+     * FUNCTIONS
+     * =================================================
      */
 
     /**
-     * DONE
-     * @param type $class
+     * 
+     * @param $class
      * @return \Form
      */
     public function addClass($class)
     {
-        
+        if (!isset($this->elements['class']))
+        {
+            $this->elements['class'] = '';
+        }
+        $this->elements['class'].=" $class";
+        return $this;
     }
 
     /**
-     * DONE
-     * @param type $id
+     * 
+     * @param $id
      * @return \Form
      */
     public function addId($id)
     {
-        
+        $this->elements['id'] = $id;
+        return $this;
     }
 
     /**
-     * DONE
-     * @param type $array
+     * 
+     * @param $array
      * @return \Form
      */
-    public function addElement($array)
+    public function addElement($array = [])
     {
-        
+        if (is_array($array) && !empty($array))
+        {
+            foreach ($array as $k => $v)
+            {
+                $this->elements[$k] = $v;
+            }
+        }
+        return $this;
     }
 
     /**
-     * DONE
+     * 
+     * @param $method
      * @return \Form
      */
     public function method($method)
     {
-        
-    }
-
-    /*     * *
-     * INPUT
-     */
-
-    public static function label($name, $for)
-    {
-        
-    }
-
-    public static function help($name = NULL)
-    {
-
-
-        return self::$_instance;
+        $this->elements['method'] = $method;
+        return $this;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $value
-     * @return type
+     * =========================================================
+     * MAIN FORM ELEMENTS
+     * =========================================================
+     */
+
+    /**
+     * 
+     * @param $name
+     * @param $for
+     * @return \Form
+     */
+    public static function label($name, $for)
+    {
+        $form = new Form();
+        $form->element_type = 'label';
+        $form->display_name = $name;
+        $form->elements['for'] = $for;
+        return $form;
+    }
+
+    /**
+     * 
+     * @param  $name
+     * @return \Form
+     */
+    public static function help($name = NULL)
+    {
+        $form = new Form();
+        $form->element_type = 'help';
+        $form->display_name = $name;
+        return $form;
+    }
+
+    /**
+     * 
+     * @param $name
+     * @param $value
+     * @return \Form
      */
     public static function text($name, $value = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'input';
+        $form->elements['type'] = 'text';
+        $form->elements['name'] = $name;
+        $form->elements['id'] = $name;
+        if (!is_null($value))
+        {
+            $form->elements['value'] = $value;
+        }
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $value
-     * @return type
+     * 
+     * @param $name
+     * @param $value
+     * @return \Form
      */
     public static function email($name, $value = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'input';
+        $form->elements['name'] = $name;
+        $form->elements['type'] = 'email';
+        if (!is_null($value))
+        {
+            $form->elements['value'] = $value;
+        }
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $value
-     * @return type
+     * 
+     * @param $name
+     * @param $value
+     * @return \Form
      */
     public static function password($name, $value = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'input';
+        $form->elements['name'] = $name;
+        $form->elements['type'] = 'password';
+        if (!is_null($value))
+        {
+            $form->elements['value'] = $value;
+        }
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $value
-     * @return type
+     * 
+     * @param $name
+     * @param $value
+     * @return \Form
      */
     public static function number($name, $value = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'input';
+        $form->elements['name'] = $name;
+        $form->elements['type'] = 'number';
+        if (!is_null($value))
+        {
+            $form->elements['value'] = $value;
+        }
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $value
-     * @return type
+     * 
+     * @param $name
+     * @param $value
+     * @return \Form
      */
     public static function search($name, $value = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'input';
+        $form->elements['name'] = $name;
+        $form->elements['type'] = 'search';
+        if (!is_null($value))
+        {
+            $form->elements['value'] = $value;
+        }
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $value
-     * @return type
+     * 
+     * @param $name
+     * @param $value
+     * @return \Form
      */
     public static function textarea($name, $value = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'textarea';
+        $form->elements['name'] = $name;
+        if (!is_null($value))
+        {
+            $form->display_value = $value;
+        }
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $options
-     * @param type $selected
-     * @return type
+     * 
+     * @param $name
+     * @param $options
+     * @param $selected
+     * @return \Form
      */
     public static function checkbox($name, $options = [], $selected = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'checkbox';
+        $form->elements['name'] = $name;
+        $form->options = $options;
+        $form->selected = $selected;
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $options
-     * @param type $selected
-     * @return type
+     * 
+     * @param $name
+     * @param $options
+     * @param $selected
+     * @return \Form
      */
     public static function radio($name, $options = [], $selected = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'radio';
+        $form->elements['name'] = $name;
+        $form->options = $options;
+        $form->selected = $selected;
+        return $form;
     }
 
     /**
-     * DONE
-     * @return type
+     * 
+     * @param $value
+     * @return \Form
      */
     public static function submit($value = 'Submit')
     {
-        
+        $form = new Form();
+        $form->element_type = 'button';
+        $form->elements['type'] = 'submit';
+        $form->display_name = $value;
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $value
-     * @return type
+     * 
+     * @param $value
+     * @return \Form
      */
     public static function reset($value = 'Reset')
     {
-        
+        $form = new Form();
+        $form->element_type = 'button';
+        $form->elements['type'] = 'reset';
+        $form->display_name = $value;
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $options
-     * @param type $selected
-     * @return type
+     * 
+     * @param $name
+     * @param $options
+     * @param $selected
+     * @return \Form
      */
     public static function select($name, $options = [], $selected = null)
     {
-        
+        $form = new Form();
+        $form->element_type = 'select';
+        $form->elements['name'] = $name;
+        $form->options = $options;
+        $form->selected = $selected;
+        return $form;
     }
 
     /**
-     * DONE
-     * @param type $name
-     * @param type $options
-     * @param type $selected
-     * @return type
+     * 
+     * @param $name
+     * @param $options
+     * @param $selected
+     * @return \Form
      */
     public static function selectMultiple($name, $options = [], $selected = [])
     {
-        
+        $form = new Form();
+        $form->element_type = 'select';
+        $form->elements['name'] = $name;
+        $form->elements['multiple'] = NULL;
+        $form->options = $options;
+        $form->selected = $selected;
+        return $form;
     }
 
     public static function selectMonth()
     {
-        
+        //soon
     }
 
     public static function date()
     {
-        
+        //soon
     }
 
     public static function datetime()
     {
-        
+        //soon
     }
 
     public static function time()
     {
-        
+        //soon
     }
 
-    //main output class
+    /**
+     * 
+     * @return string
+     */
     public function render()
     {
 
-        switch (self::$type)
+        switch ($this->element_type)
         {
             case "form":
-//                $this->addClass('form-horizontal');
-                return $this->getForForm();
+                $this->addClass('form-horizontal');
+                return $this->renderForm();
                 break;
             case "input":
                 $this->addClass('form-control');
-                return $this->getForInput();
+                return $this->renderInput();
                 break;
             case "textarea":
                 $this->addClass('form-control');
-                return $this->getForTextarea();
+                return $this->renderTextarea();
                 break;
             case "radio":
                 $this->addClass('radio');
-                return $this->getForRadio();
+                return $this->renderRadio();
                 break;
             case "checkbox":
                 $this->addClass('checkbox');
-                return $this->getForCheckbox();
+                return $this->renderCheckbox();
                 break;
             case "select":
-                return $this->getForSelect();
+                return $this->renderSelect();
                 break;
 
             case "button":
                 $this->addClass('btn btn-primary');
-                return $this->getForButton();
+                return $this->renderButton();
                 break;
 
             case "label":
                 $this->addClass('control-label');
-                return $this->getForLabel();
+                return $this->renderLabel();
                 break;
             case "help":
                 $this->addClass('help-block with-errors');
-                return $this->getForHelp();
+                return $this->renderHelp();
                 break;
 
             default:
@@ -371,66 +482,79 @@ class Form {
         }
     }
 
-    private function getForLabel()
+    /**
+     * ===================================================
+     * PRIVATE METHODS
+     * ===================================================
+     */
+
+    /**
+     * 
+     * @return string
+     */
+    private function renderLabel()
     {
 
-        $class = $this->getClass();
-
-        $name = self::$name_id;
-        $for = self::$for;
-        return '<label for="' . $for . '" ' . $class . '>' . $name . '</label>';
-    }
-
-    private function getForHelp()
-    {
-        $name = self::$name_id;
-        //name for ci validation
-        $class = $this->getClass();
-        return '<span ' . $class . ' ></span>';
-    }
-
-    private function getForForm()
-    {
-        $type = $this->getType();
-        $name_id = $this->getName();
-        $class = $this->getClass();
-        $id = $this->getId();
         $elements = $this->getElements();
-        $method = $this->getMethod();
-        return '<form role="form" ' . $method . ' ' . $name_id . ' ' . $class . ' ' . $id . ' ' . $elements . '>';
+        return '<label ' . $elements . '>' . $this->display_name . '</label>' . PHP_EOL;
     }
 
-    private function getForInput()
+    /**
+     * 
+     * @return string
+     */
+    private function renderHelp()
     {
-        //id not works here
-        $type = $this->getType();
-        $name_id = $this->getName();
-        $class = $this->getClass();
-        $id = $this->getId();
         $elements = $this->getElements();
 
-        $inputType = 'type="' . self::$inputType . '" ';
-        return '<input ' . $inputType . ' ' . $name_id . ' ' . $class . ' ' . $elements . '>';
+        return '<span ' . $elements . ' >' . $this->display_name . '</span>' . PHP_EOL;
     }
 
-    private function getForTextarea()
+    /**
+     * 
+     * @return string
+     */
+    private function renderForm()
     {
-        $type = $this->getType();
-        $name_id = $this->getName();
-        $class = $this->getClass();
-        $id = $this->getId();
+
         $elements = $this->getElements();
 
-
-        return '<textarea ' . $name_id . ' ' . $class . ' ' . $id . ' ' . $elements . ' ></textarea>';
+        return '<form role="form" ' . $elements . '>' . PHP_EOL;
     }
 
-    private function getForRadio()
+    /**
+     * 
+     * @return string
+     */
+    private function renderInput()
     {
-        $name = 'name="' . self::$name_id . '" ';
-        $options = self::$options;
-        $selected = self::$selected;
-        $class = $this->getClass();
+
+        $elements = $this->getElements();
+        return '<input ' . $elements . '>' . PHP_EOL;
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    private function renderTextarea()
+    {
+
+        $elements = $this->getElements();
+        return '<textarea ' . $elements . ' >' . $this->display_value . '</textarea>' . PHP_EOL;
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    private function renderRadio()
+    {
+
+        $options = $this->options;
+        $selected = $this->selected;
+
+        $elements = $this->getElements();
         $str = '';
         if (!empty($options)):
             foreach ($options as $option => $value):
@@ -440,21 +564,23 @@ class Form {
                     $active = 'checked="checked" ';
                 }
 
-                $str.= '<div ' . $class . '>
-                    <label><input type="radio" ' . $name . ' value="' . $value . '" ' . $active . '>' . $option . '</label>
-                    </div>';
+                $str.= '<div class="radio">' . PHP_EOL .
+                        '<label>' . PHP_EOL . '<input' . $elements . ' ' . $active . '>' . PHP_EOL . $option . '</label>' . PHP_EOL .
+                        '</div>';
             endforeach;
         endif;
         return $str;
     }
 
-    private function getForCheckbox()
+    /**
+     * 
+     * @return string
+     */
+    private function renderCheckbox()
     {
-        $name = 'name = "' . self::$name_id . '" ';
-        $class = $this->getClass();
-        $id = $this->getId();
-        $options = self::$options;
-        $selected = self::$selected;
+        $elements = $this->getElements();
+        $options = $this->options;
+        $selected = $this->selected;
         $str = '';
         if (!empty($options)):
             foreach ($options as $option => $value):
@@ -465,23 +591,29 @@ class Form {
                     $active = 'checked="checked"';
                 }
 
-                $str.= '<div ' . $class . '><label><input type="checkbox" ' . $name . ' value="' . $value . '" ' . $id . ' ' . $active . '>' . $option . '</label></div>';
+                $str.= '<div class"checkbox">' . PHP_EOL . '<label><input ' . $elements . ' ' . $active . '>' . $option . '</label>' . PHP_EOL . '</div>';
             endforeach;
         endif;
         return $str;
     }
 
-    private function getForSelect()
+    /**
+     * 
+     * @return string
+     */
+    private function renderSelect()
     {
-        $type = $this->getType();
-        $name_id = $this->getName();
-        $class = $this->getClass();
-//        $id = $this->getId();
+
         $elements = $this->getElements();
-        $inputType = self::$inputType;
-        $options = self::$options;
-        $selected = self::$selected;
-        $str = '<select ' . ' ' . $name_id . $inputType . ' ' . $class . ' ' . $elements . '>';
+
+        $options = $this->options;
+        $selected = $this->selected;
+        $t = '';
+        if (isset($elements['multiple']))
+        {
+            $t = 'multiple';
+        }
+        $str = '<select ' . $t . ' ' . $elements . '>' . PHP_EOL;
         foreach ($options as $key => $value):
 
             $active = '';
@@ -496,83 +628,38 @@ class Form {
                     $active = 'selected="selected"';
                 }
             }
-            $str.='<option value="' . $value . '" ' . $active . '>' . $key . '</option>';
+            $str.='<option value="' . $value . '" ' . $active . '>' . $key . '</option>' . PHP_EOL;
         endforeach;
-        $str.='</select>';
+        $str.='</select>' . PHP_EOL;
         return $str;
     }
 
-    private function getForButton()
+    /**
+     * 
+     * @return string
+     */
+    private function renderButton()
     {
-        $type = self::$inputType;
-        $value = self::$btnName;
-        $class = $this->getClass();
-        return '<button type="' . $type . '" ' . $class . '>' . $value . '</button>';
+        $elements = $this->getElements();
+        return '<button ' . $elements . '>' . $this->display_name . '</button>' . PHP_EOL;
     }
 
-    private function getType()
+    /**
+     * 
+     * @return boolean
+     */
+    private function getElementType()
     {
-        return self::$type;
+        return $this->element_type;
     }
 
-//form only
-    private function getMethod()
-    {
-        $method = self::$method;
-        return 'method = "' . $method . '"';
-    }
-
-    private function getClass()
-    {
-        $class = null;
-        $class = $this->class; //self::$class;
-
-
-
-
-        if (empty($class))
-        {
-            return '';
-        }
-        $str = '';
-        if (is_array($class))
-        {
-            foreach ($class as $c)
-            {
-                $str .= ' ' . $c;
-            }
-        }
-        else
-        {
-            $str = $class;
-        }
-
-        return 'class="' . $str . '"';
-    }
-
-    private function getId()
-    {
-        $id = self::$id; //addId only add id not name
-        if (empty($id))
-        {
-            return '';
-        }
-        return 'id="' . $id . '"';
-    }
-
-    private function getName()
-    {
-        $name_id = self::$name_id;
-        if (is_null($name_id))
-        {
-            return '';
-        }
-        return 'name="' . $name_id . '" id="' . $name_id . '"';
-    }
-
+    /**
+     * 
+     * @return string
+     */
     private function getElements()
     {
-        $elements = self::$elements;
+        $elements = $this->elements;
         if (empty($elements))
         {
             return '';
@@ -586,78 +673,13 @@ class Form {
         return $str;
     }
 
-    public function test($works)
-    {
-        echo $works;
-        return $this;
-    }
-
+    /**
+     * 
+     * @return string
+     */
     public function __toString()
     {
         return $this->render();
     }
 
-    public function __destruct()
-    {
-        echo 'end';
-    }
-
-    public function __ssasdestruct()
-    {
-        self::$type; //type of input
-        self::$class = []; //have multiple class
-        self::$name_id = null; //should be unique and same
-        self::$id = null;
-        self::$elements = []; //for extra element //action
-        self::$hidden = []; //for open form only :)
-        self::$method = 'POST';
-        self::$hidden = []; //for open form only :)
-        self::$method = 'POST';
-        self::$inputType = null; //text,email,number,search
-        self::$options = [];
-        self::$selected = null;
-        self::$btnName = null;
-
-        /**
-         * Instance
-         */
-        self::$_instance = null;
-    }
-
 }
-
-//echo Form::open()->method('GET')->addId('form');
-//echo Form::text('name')->addClass('input-lg');
-//echo Form::textarea('works')->addClass('tinymce');
-//echo Form::radio('gender', ['male', 'female','unknown']);
-//echo Form::text('hobbie')->addClass('input-lg');
-//echo Form::checkbox('works', ['gender' => 1, 'mender' => 2]);
-//echo Form::close();
-//echo Form::close();
-//tested echo Form::close();
-//echo Form::checkbox('gender', ['Male' => '1', 'Female' => 2], 2);
-//echo Form::selectMultiple('country', ['india' => 5, 'bangladesh' => 6, 'nepal' => 10], [5, 6]);
-?>
-
-
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" />
-
-
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-
-        <?= Form::text('works')->addClass('onother')->addElement(['pattern' => 'email']) ?>
-
-        <?= Form::email('email')->addClass('dsdas') ?>
-        <?= Form::close() ?>
-    </div>
-</div>
-
-
-
-
-<?=
-Form::text('test')->test('try to understand')->test('work or not')?>
