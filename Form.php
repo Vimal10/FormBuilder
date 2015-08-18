@@ -460,6 +460,7 @@ class Form {
                 return $this->renderCheckbox();
                 break;
             case "select":
+                 $this->addClass('form-control');
                 return $this->renderSelect();
                 break;
 
