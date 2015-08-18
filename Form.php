@@ -58,6 +58,7 @@
  */
 class Form {
 
+//Not Working
     public $type = null; //type of input
     public $class = []; //have multiple class
     public static $elements = []; //for all element //action
