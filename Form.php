@@ -164,6 +164,16 @@ class Form {
         $this->elements['method'] = $method;
         return $this;
     }
+    
+     /**
+     *
+     * @return \Form
+     */
+    public function required()
+    {
+        $this->elements['required'] = 'required';
+        return $this;
+    }
 
     /**
      * =========================================================
